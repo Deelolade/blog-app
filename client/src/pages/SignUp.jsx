@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import OAuth from "../components/OAuth";
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Signup = () => {
     const navigate = useNavigate();
+    const [passwordType, setPasswordType] = useState("password");
+    const [passwordIcon, setPasswordIcon] = useState(FaEye);
     const [errors, setErrors] = useState({});
     const [successMessage, setSuccessMessage] = useState(false);
     const [formData, setFormData] = useState({
@@ -14,7 +18,16 @@ const Signup = () => {
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
-
+    const handlePasswordToggle = ()=> {
+        if(passwordType === "password"){
+            setPasswordType("text")
+            setPasswordIcon(FaEyeSlash)
+        }
+        if(passwordType === "text"){
+            setPasswordType("password")
+            setPasswordIcon(FaEye)
+        }
+    }
     // Form validation
     const validate = () => {
         let tempErrors = {};
@@ -30,10 +43,6 @@ const Signup = () => {
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
-    //   useEffect(() => {
-    //     setSuccessMessage("Sign up successful! Redirecting...");
-    //     setTimeout(() => navigate("/sign-in"), 2000);
-    // })
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validate()) {
@@ -68,7 +77,7 @@ const Signup = () => {
                 {successMessage && (
                     <div className="fixed inset-0 flex justify-center items-center bg-black/20">
                         <div className="bg-white p-4 rounded-lg shadow-lg">
-                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     </div>
                 )}
@@ -112,14 +121,22 @@ const Signup = () => {
                         <label className="block text-sm font-medium text-gray-700">
                             Password
                         </label>
-                        <input
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            className="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter password"
-                        />
+                        <div className="mt-1 w-full flex justify-between items-center px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <input
+                                type={passwordType}
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="Enter password"
+                                className="outline-none w-[90%]"
+                            />
+                            <i
+                                className="password-icon"
+                                onClick={handlePasswordToggle}
+                            >
+                                {passwordIcon}
+                            </i>
+                        </div>
                         {errors.password && (
                             <p className="text-red-500 text-sm">{errors.password}</p>
                         )}
@@ -131,12 +148,8 @@ const Signup = () => {
                     >
                         Sign Up
                     </button>
-                    <button
-                        type="submit"
-                        className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition"
-                    >
-                        Sign up with Google
-                    </button>
+
+                    <OAuth />
                     <div className="text-center text-slate-500  mx-auto w-full">
                         <Link to="/sign-in" className="hover:underline">
                             {" "}
