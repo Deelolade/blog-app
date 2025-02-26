@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -72,7 +72,7 @@ const Signup = () => {
     };
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100">
-            <div className="w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
+            <div className="w-screen max-w-md p-6 bg-white shadow-lg rounded-lg">
                 <h2 className="text-2xl font-semibold text-center mb-4">Sign Up</h2>
                 {successMessage && (
                     <div className="fixed inset-0 flex justify-center items-center bg-black/20">
@@ -144,7 +144,7 @@ const Signup = () => {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+                        className="w-full bg-green-500 text-white outline py-2 rounded-lg  transition hover:outline-green-200"
                     >
                         Sign Up
                     </button>

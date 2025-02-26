@@ -149,7 +149,7 @@ const SignIn = () => {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+                        className="w-full bg-blue-500 text-white outline py-2 rounded-lg  transition hover:outline-blue-200 "
                     >
                         Sign In
                     </button>
