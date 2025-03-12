@@ -1,5 +1,5 @@
 const express = require('express');
-const {signup, signin, google} = require('../controllers/auth.contoller.js')
+const {signup, signin, google } = require('../controllers/auth.contoller.js')
 const router = express.Router();
 
 

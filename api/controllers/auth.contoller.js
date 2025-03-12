@@ -26,8 +26,8 @@ const signup = async (req, res, next) => {
 }
 // POST /api/auth/signin
 const signin = async (req, res, next) => {
-    const { username,email, password } = req.body;
-    if (!username || !email || !password || email === "" || password === "" || username === "") {
+    const { email, password } = req.body;
+    if ( !email || !password || email === "" || password === ""  ) {
         next(errorHandler(400, "All Fields are required"))
     }
     try {

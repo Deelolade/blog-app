@@ -130,12 +130,12 @@ const Signup = () => {
                                 placeholder="Enter password"
                                 className="outline-none w-[90%]"
                             />
-                            <i
+                            <button
                                 className="password-icon"
                                 onClick={handlePasswordToggle}
                             >
                                 {passwordIcon}
-                            </i>
+                            </button>
                         </div>
                         {errors.password && (
                             <p className="text-red-500 text-sm">{errors.password}</p>

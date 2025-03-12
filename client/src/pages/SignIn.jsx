@@ -1,166 +1,93 @@
-import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
+import { useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice";
 import OAuth from "../components/OAuth";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 
-const SignIn = () => {
+export default function SignIn() {
+    const [formData, setFormData] = useState({});
+    const { loading, error: errorMessage } = useSelector(state => state.user);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [passwordType, setPasswordType] = useState('password');
+    const [passwordType, setPasswordType] = useState("password");
     const [passwordIcon, setPasswordIcon] = useState(FaEye);
-    const [successMessage, setSuccessMessage] = useState(false);
-    const [errors, setErrors] = useState({});
-    const [formData, setFormData] = useState({
-        username: "",
-        email: "",
-        password: "",
-    });
 
-    const handlePasswordToggle = () => {
-        if (passwordType === 'password') {
-            setPasswordType('text');
-            setPasswordIcon(FaEyeSlash);
-        } else {
-            setPasswordType('password');
-            setPasswordIcon(FaEye);
-        }
-    };
-
-
-    // Handle form input changes
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
     };
-
-    // Form validation
-    const validate = () => {
-        let tempErrors = {};
-        if (!formData.username.trim()) {
-            tempErrors.username = "*Username is required*";
+    const handlePasswordToggle = () => {
+        if (passwordType === "password") {
+            setPasswordType("text")
+            setPasswordIcon(FaEyeSlash)
         }
-        if (!formData.email.match(/^\S+@\S+\.\S+$/)) {
-            tempErrors.email = "Valid email is required";
+        if (passwordType === "text") {
+            setPasswordType("password")
+            setPasswordIcon(FaEye)
         }
-        if (formData.password.length < 6) {
-            tempErrors.password = "Password must be at least 6 characters";
-        }
+    }
 
-        setErrors(tempErrors);
-        return Object.keys(tempErrors).length === 0;
-    };
-
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!formData.email || !formData.password) {
-            return setErrors({ general: "Please fill out all fields" });
+            return dispatch(signInFailure('Please fill all the fields'));
         }
-
         try {
-            const res = await fetch("http://localhost:5000/api/auth/signin", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
+            dispatch(signInStart());
+            const res = await fetch('http://localhost:5000/api/auth/signin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
             });
-
             const data = await res.json();
-            console.log(data);
-
             if (!res.ok) {
-                return setErrors({ general: data.message || "Invalid credentials" });
+                dispatch(signInFailure(data.message));
+            } else {
+                dispatch(signInSuccess(data));
+                navigate('/');
             }
-
-            // Save token & redirect
-            localStorage.setItem("authToken", data.token);
-            navigate("/");
         } catch (error) {
-            console.error(error);
-            setErrors({ general: "Something went wrong. Try again later." });
+            dispatch(signInFailure(error.message));
         }
     };
 
-
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
-            <div className="w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
-                <h2 className="text-2xl font-semibold text-center mb-4">Sign In</h2>
-                {successMessage && (
-                    <div className="fixed inset-0 flex justify-center items-center bg-black/20">
-                        <div className="bg-white p-4 rounded-lg shadow-lg">
-                            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                    </div>
-                )}
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Email Field */}
+        <div className="min-h-screen flex items-center justify-center">
+            <div className="w-full max-w-md p-6 space-y-6 bg-white shadow-md rounded-lg">
+                <h2 className="text-2xl font-semibold text-center">Sign In</h2>
+                <p className="text-center text-sm">Sign in with your email or Google.</p>
+                <form className="space-y-4" onSubmit={handleSubmit}>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Username
-                        </label>
-                        <input
-                            type="text"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleChange}
-                            className="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter username"
-                        />
-                        {errors.username && (
-                            <p className="text-red-500 text-sm">{errors.username}</p>
-                        )}
+                        <Label value="Email" />
+                        {/* <TextInput type="email" id="email" placeholder="Enter your email" className="border-none outline-none " onChange={handleChange} /> */}
+                        <input type="email" id="email" placeholder="Enter your email" className=" p-3 rounded-md w-full shadow-md focus:outline-none focus:ring-2 focus:ring-green-400" onChange={handleChange} />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter email"
-                        />
-                        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-                    </div>
-
-                    {/* Password Field */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Password</label>
-                        <div className="mt-1 w-full flex justify-between items-center px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <input
-                                type={passwordType}
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                placeholder="Enter password"
-                                className="outline-none w-[90%]"
-                            />
-                            <i
-                                className="password-icon"
+                    <div className="">
+                        <Label value="Password" />
+                        <div className="flex justify-between  p-3 rounded-md w-full shadow-md focus:outline-none focus:ring-2 focus:ring-green-400">
+                            {/* <TextInput type="password" id="password" placeholder="Enter your password" onChange={handleChange} /> */}
+                            <input type={passwordType} id="password" className="outline-none w-[90%]" placeholder="Enter your password" onChange={handleChange} />
+                            <button
+                                type="button"
+                                className="ml-2 text-gray-600 hover:text-gray-800"
                                 onClick={handlePasswordToggle}
                             >
                                 {passwordIcon}
-                            </i>
+                            </button>
                         </div>
-                        {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
                     </div>
-                    {/* Submit Button */}
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-500 text-white outline py-2 rounded-lg  transition hover:outline-blue-200 "
-                    >
-                        Sign In
-                    </button>
-                    <OAuth />
-                    <div className="text-center text-slate-500  mx-auto w-full">
-                        <Link to='/sign-up' className="hover:underline"> Don't have an account</Link>
-                    </div>
+                    <Button type="submit" disabled={loading} className="w-full bg-green-500 hover:bg-green-600 text-white py-1 rounded-md  shadow-md flex items-center justify-center">
+                        {loading ? (<><Spinner size="sm" /><span className="ml-2">Signing in...</span></>) : 'Sign In'}
+                    </Button>
                 </form>
+                <OAuth />
+                <div className="text-center text-sm">
+                    Don't have an account? <Link to="/sign-up" className="text-blue-600">Sign Up</Link>
+                </div>
+                {errorMessage && <Alert color="failure" className="text-red-500">*{errorMessage}*</Alert>}
             </div>
         </div>
     );
-};
-
-export default SignIn;
+}

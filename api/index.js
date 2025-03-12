@@ -5,8 +5,10 @@ const connectDB = require('./db');
 const userRouter = require('./routes/user.route.js');
 const authRouter = require('./routes/auth.route.js');
 const cors = require('cors');
+const cookieparser = require("cookie-parser");
 app.use(express.json())
 app.use(cors());
+app.use(cookieparser());
 
 app.listen(port, ()=>{
     console.log(`Server is running on port ${port}`);

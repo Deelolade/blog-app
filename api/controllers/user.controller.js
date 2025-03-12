@@ -1,4 +1,4 @@
-const User = (req, res) => {
-    res.json("api is working")
+const updateUser =  (req, res, next) => {
+    console.log(req.user)
 }
-module.exports = User;
+module.exports = updateUser;
